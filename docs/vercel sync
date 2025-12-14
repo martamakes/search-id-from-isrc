@@ -1,0 +1,257 @@
+# 📋 Sincronizar Repo para Vercel
+
+Estos son los archivos que necesitas copiar/actualizar en tu GitHub repo.
+
+---
+
+## 📂 Estructura que Necesitas
+
+```
+search-id-from-isrc/
+├── isrc-spotify-backend/
+│   ├── server.js                  (ya tienes)
+│   ├── package.json               (ACTUALIZAR)
+│   ├── .env.example               (ya tienes)
+│   ├── Dockerfile                 (ya tienes)
+│   └── vercel.json                ✨ NUEVO
+│
+├── isrc-spotify-frontend/
+│   ├── ISRCSearcher.jsx           (ya tienes)
+│   ├── ISRCSearcher.css           (ya tienes)
+│   ├── App.jsx                    (ya tienes)
+│   ├── index.jsx                  ✨ NUEVO
+│   ├── index.css                  ✨ NUEVO
+│   ├── package.json               ✨ NUEVO
+│   ├── vercel.json                ✨ NUEVO
+│   ├── .env.production            ✨ NUEVO
+│   ├── nginx.conf                 (ya tienes)
+│   ├── Dockerfile                 (ya tienes)
+│   └── public/                    ✨ NUEVA CARPETA
+│       └── index.html             ✨ NUEVO
+│
+├── VERCEL_DEPLOY.md               ✨ NUEVO (esta guía)
+├── docker-compose.yml             (ya tienes)
+├── .gitignore                      (ya tienes)
+└── ... otros archivos
+```
+
+---
+
+## 🔧 Archivos a Copiar/Crear
+
+### Backend - ACTUALIZAR
+
+**Archivo:** `isrc-spotify-backend/package.json`
+
+Reemplaza la sección `"scripts"`:
+
+```json
+"scripts": {
+  "start": "node server.js",
+  "dev": "nodemon server.js"
+},
+```
+
+### Backend - NUEVO
+
+Crea archivo: `isrc-spotify-backend/vercel.json`
+
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
+```
+
+---
+
+### Frontend - NUEVO
+
+Crea archivo: `isrc-spotify-frontend/package.json`
+
+```json
+{
+  "name": "isrc-spotify-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "axios": "^1.6.0",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
+```
+
+### Frontend - NUEVO
+
+Crea archivo: `isrc-spotify-frontend/index.jsx`
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+```
+
+### Frontend - NUEVO
+
+Crea archivo: `isrc-spotify-frontend/index.css`
+
+```css
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+```
+
+### Frontend - NUEVO
+
+Crea carpeta: `isrc-spotify-frontend/public/`
+
+Crea archivo: `isrc-spotify-frontend/public/index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#667eea" />
+    <meta
+      name="description"
+      content="ISRC Spotify Lookup Tool - Find Spotify track IDs from ISRC codes"
+    />
+    <title>🎵 ISRC Spotify Lookup Tool</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
+```
+
+### Frontend - NUEVO
+
+Crea archivo: `isrc-spotify-frontend/vercel.json`
+
+```json
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm start",
+  "installCommand": "npm install",
+  "framework": "react"
+}
+```
+
+### Frontend - NUEVO
+
+Crea archivo: `isrc-spotify-frontend/.env.production`
+
+```
+REACT_APP_API_URL=https://isrc-spotify-api.vercel.app
+```
+
+(Cambio después de deployar el backend)
+
+---
+
+## ⚡ Comando Rápido
+
+Si copias todos los archivos, luego:
+
+```bash
+cd ~/tu-repo/search-id-from-isrc
+
+# Commit de todos los cambios
+git add .
+git commit -m "Add Vercel configuration files"
+git push origin main
+
+# Y listo! Vercel detectará los cambios automáticamente
+```
+
+---
+
+## ✅ Checklist Pre-Vercel
+
+- [ ] Copié/creé todos los archivos de arriba
+- [ ] Mi `.gitignore` tiene `.env` (no `.env.production`)
+- [ ] El backend tiene `vercel.json`
+- [ ] El frontend tiene `package.json` con dependencias React
+- [ ] El frontend tiene `public/index.html`
+- [ ] El frontend tiene `index.jsx` y `index.css`
+- [ ] Hice `git push` de todos los cambios
+
+---
+
+## 🎯 Siguiente Paso
+
+Lee **VERCEL_DEPLOY.md** para el deployment paso a paso.
+
+---
+
+¡Casi listo! 🚀
